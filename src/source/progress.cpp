@@ -28,9 +28,7 @@ progress_source::progress_source(obs_source_t* src, obs_data_t* settings)
     update(settings);
 }
 
-progress_source::~progress_source()
-{
-}
+progress_source::~progress_source() { }
 
 void progress_source::tick(float seconds)
 {
@@ -127,8 +125,7 @@ void progress_source::update(obs_data_t* settings)
     m_hide_paused = obs_data_get_bool(settings, S_PROGRESS_HIDE_PAUSED);
 }
 
-static bool use_bg_changed(obs_properties_t* props, obs_property_t* property,
-    obs_data_t* settings)
+static bool use_bg_changed(obs_properties_t* props, obs_property_t* property, obs_data_t* settings)
 {
     UNUSED_PARAMETER(property);
     auto* prop = obs_properties_get(props, S_PROGRESS_BG);
@@ -158,9 +155,7 @@ void register_progress()
     si.output_flags = OBS_SOURCE_VIDEO | OBS_SOURCE_CUSTOM_DRAW;
     si.get_properties = get_properties_for_progress;
     si.get_name = [](void*) { return T_PROGRESS_NAME; };
-    si.create = [](obs_data_t* d, obs_source_t* s) {
-        return static_cast<void*>(new progress_source(s, d));
-    };
+    si.create = [](obs_data_t* d, obs_source_t* s) { return static_cast<void*>(new progress_source(s, d)); };
     si.destroy = [](void* data) { delete reinterpret_cast<progress_source*>(data); };
     si.get_width = [](void* data) { return reinterpret_cast<progress_source*>(data)->get_width(); };
     si.get_height = [](void* data) { return reinterpret_cast<progress_source*>(data)->get_height(); };

@@ -66,15 +66,12 @@ protected:
 public:
     music_source(const char* id, const char* name);
 
-    virtual ~music_source() {}
+    virtual ~music_source() { }
 
     /* util */
     uint32_t get_capabilities() const { return m_capabilities; }
 
-    bool has_capability(capability c) const
-    {
-        return m_capabilities & ((uint16_t)c);
-    }
+    bool has_capability(capability c) const { return m_capabilities & ((uint16_t)c); }
 
     const song& song_info() const { return m_current; }
     void reset_info() { m_current.clear(); }

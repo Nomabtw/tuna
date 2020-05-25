@@ -58,10 +58,10 @@ public:
     mpd_source()
         : music_source(S_SOURCE_MPD, T_SOURCE_MPD) {};
     ~mpd_source() = default;
-    void load() override {}
-    void save() override {}
-    void refresh() override {}
-    void set_gui_values() override {}
+    void load() override { }
+    void save() override { }
+    void refresh() override { }
+    void set_gui_values() override { }
 
     bool execute_capability(capability c) override
     {

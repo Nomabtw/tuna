@@ -17,10 +17,7 @@ public:
     ~music_Control();
 
     void save_settings();
-    bool visible()
-    {
-        return m_visible;
-    }
+    bool visible() { return m_visible; }
 
     virtual void closeEvent(QCloseEvent* event);
 signals:

@@ -68,9 +68,7 @@ void mpd_source::connect()
         m_connection = mpd_connection_new(qt_to_utf8(m_address), m_port, 2000);
 
     if (mpd_connection_get_error(m_connection) != MPD_ERROR_SUCCESS) {
-        berr("mpd connection to %s:%hu failed with error %s",
-            qt_to_utf8(m_address),
-            m_port,
+        berr("mpd connection to %s:%hu failed with error %s", qt_to_utf8(m_address), m_port,
             mpd_connection_get_error_message(m_connection));
         mpd_connection_free(m_connection);
         m_connection = nullptr;
