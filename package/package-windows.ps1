@@ -77,7 +77,7 @@ Copy-Item $build_location_x64/$project.pdb -Destination $build_dir/plugin/obs-pl
 echo("Fetching data")
 Copy-Item $data_dir/* -Destination $build_dir/plugin/data/obs-plugins/$project/ -Recurse
 Copy-Item ../LICENSE -Destination $build_dir/LICENSE.txt
-Copy-Item ./README.txt $build_dir/README.txt
+Copy-Item ./README $build_dir/README.txt
 
 replace $build_dir/README.txt "@VERSION" $version
 replace $build_dir/README.txt "@PROJECT" $project

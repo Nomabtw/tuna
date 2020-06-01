@@ -8,7 +8,7 @@ version=$1
 data_dir="../data"
 project="tuna"
 arch="mac"
-qt_version="5_10_1"
+qt_version="5_14_2"
 build_location="../../../../build-obs-studio-Qt_${qt_version}_${qt_version}-RelWithDebInfo/rundir/RelWithDebInfo/obs-plugins"
 build_dir=$project.v$version.$arch
 
@@ -16,6 +16,16 @@ if [ -z "$version" ]; then
 	echo "Please provide a version string"
 	exit
 fi
+
+# Yanked from obs-mac-virtualcam, fixes QT runtime dps
+install_name_tool \
+  -change $(brew --prefix qt5)/lib/QtWidgets.framework/Versions/5/QtWidgets \
+    @executable_path/../Frameworks/QtWidgets.framework/Versions/5/QtWidgets \
+  -change $(brew --prefix qt5)/lib/QtGui.framework/Versions/5/QtGui \
+    @executable_path/../Frameworks/QtGui.framework/Versions/5/QtGui \
+  -change $(brew --prefix qt5)/lib/QtCore.framework/Versions/5/QtCore \
+    @executable_path/../Frameworks/QtCore.framework/Versions/5/QtCore \
+  $build_location/${project}.so
 
 echo "Creating build directory"
 mkdir -p $build_dir/$project
@@ -33,9 +43,9 @@ cp ../LICENSE $build_dir/LICENSE.txt
 cp ./install-mac.sh $build_dir/
 
 echo "Writing version number $version and project id $project"
-sed -i -e "s/@VERSION/$version/g" $build_dir/README.txt
-sed -i -e "s/@PROJECT/$project/g" $build_dir/README.txt
-rm $build_dir/README.txt-e
+sed -i -e "s/@VERSION/$version/g" ./README.txt
+sed -i -e "s/@PROJECT/$project/g" ./README.txt-e
+rm $build_dir/README.txt
 mv ./README.txt-e $build_dir/README.txt
 
 echo "Zipping to $project.v$version.$arch.zip"

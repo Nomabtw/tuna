@@ -52,7 +52,7 @@ if (APPLE)
     add_definitions(-DMACOS=1)
     set(tuna_platform_sources "./src/util/window/window_helper_mac.mm")
         find_library(COCOA Cocoa)
-        find_Library(MPDCLIENT mpdclient)
+        find_library(MPDCLIENT mpdclient)
         find_library(TAG tag)
         find_path(MPDCLIENT_INCLUDES mpd/client.h)
         find_path(TAG_INCLUDES taglib/tag.h)
@@ -63,10 +63,10 @@ if (APPLE)
     set_source_files_properties("./src/util/window/window_helper_mac.mm"
         PROPERTIES COMPILE_FLAGS "-fobjc-arc")
 
-        set(tuna_platform_deps
-                ${COCOA}
-                ${MPDCLIENT}
-                ${TAG})
+    set(tuna_platform_deps
+            ${COCOA}
+            ${MPDCLIENT}
+            ${TAG})
 endif()
 
 if (UNIX)
@@ -95,7 +95,7 @@ else()
 endif()
 
 if (DISABLE_VLC)
-    message(STATUS "VLC integration disabled")
+    message(STATUS "[tuna] VLC integration disabled")
     add_definitions(-DDISABLE_TUNA_VLC=1)
 else()
     include_directories(${LIBVLC_INCLUDE_DIRS})
@@ -104,6 +104,11 @@ else()
         ./src/query/vlc_obs_source.cpp
         ./src/util/vlc_internal.h
         ./src/util/vlc_internal.c)
+endif()
+
+if (TAG OR TAGLIB_FOUND)
+    message(STATUS "[tuna] MPD support enabled")
+    add_definitions(-DHAVE_MPD)
 endif()
 
 set(tuna_sources

@@ -20,7 +20,7 @@
 #include "../util/constants.hpp"
 #include "music_source.hpp"
 
-#ifdef UNIX
+#ifdef HAVE_MPD
 #include <mpd/client.h>
 
 class mpd_source : public music_source {
@@ -58,10 +58,10 @@ public:
     mpd_source()
         : music_source(S_SOURCE_MPD, T_SOURCE_MPD) {};
     ~mpd_source() = default;
-    void load() override { }
-    void save() override { }
-    void refresh() override { }
-    void set_gui_values() override { }
+    void load() override {}
+    void save() override {}
+    void refresh() override {}
+    void set_gui_values() override {}
 
     bool execute_capability(capability c) override
     {

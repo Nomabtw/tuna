@@ -16,7 +16,7 @@ music_Control::music_Control(QWidget* parent)
     , ui(new Ui::music_Control)
 {
     ui->setupUi(this);
-
+    setVisible(false); /* Invisible by default to prevent it from showing until Geometry is loaded */
     const char* geo = CGET_STR(CFG_DOCK_GEOMETRY);
     if (!geo) {
         QByteArray arr = QByteArray::fromBase64(geo);
@@ -50,7 +50,7 @@ music_Control::music_Control(QWidget* parent)
     m_song_text->setVisible(CGET_BOOL(CFG_DOCK_INFO_VISIBLE));
 }
 
-void music_Control::closeEvent(QCloseEvent* event) { }
+void music_Control::closeEvent(QCloseEvent* event) {}
 
 void music_Control::save_settings()
 {

@@ -28,7 +28,7 @@ progress_source::progress_source(obs_source_t* src, obs_data_t* settings)
     update(settings);
 }
 
-progress_source::~progress_source() { }
+progress_source::~progress_source() {}
 
 void progress_source::tick(float seconds)
 {
@@ -40,8 +40,8 @@ void progress_source::tick(float seconds)
 
     if (m_active) {
         if ((tmp.data() & CAP_DURATION) && (tmp.data() & CAP_PROGRESS)) {
-            if (tmp.get_int_value('p') == m_synced_progress) {
-
+            if (tmp.get_int_value('p') <= m_synced_progress) {
+                m_adjusted_progress += seconds;
             } else {
                 m_synced_progress = tmp.get_int_value('p');
                 m_adjusted_progress = m_synced_progress + seconds;
@@ -49,6 +49,7 @@ void progress_source::tick(float seconds)
             float duration = tmp.get_int_value('l');
             if (duration > 0)
                 m_progress = m_adjusted_progress / duration;
+            bdebug("Progress: %.3f", m_progress);
         }
     }
 
