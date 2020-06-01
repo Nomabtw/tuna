@@ -37,8 +37,8 @@ void progress_source::tick(float seconds)
     tmp = thread::copy;
     thread::copy_mutex.unlock();
     m_active = tmp.playing();
-
     if (m_active) {
+        seconds *= 1000; /* s -> ms */
         if ((tmp.data() & CAP_DURATION) && (tmp.data() & CAP_PROGRESS)) {
             if (tmp.get_int_value('p') != m_synced_progress) {
                 m_synced_progress = tmp.get_int_value('p');
@@ -49,6 +49,7 @@ void progress_source::tick(float seconds)
         } else if (m_synced_progress > 0) {
             m_adjusted_progress += seconds;
         }
+
 
         float duration = tmp.get_int_value('l');
         if (duration > 0)
