@@ -40,20 +40,20 @@ void progress_source::tick(float seconds)
 
     if (m_active) {
         if ((tmp.data() & CAP_DURATION) && (tmp.data() & CAP_PROGRESS)) {
-            if (tmp.get_int_value('p') <= m_synced_progress) {
-                m_adjusted_progress += seconds;
-            } else {
+            if (tmp.get_int_value('p') != m_synced_progress) {
                 m_synced_progress = tmp.get_int_value('p');
                 m_adjusted_progress = m_synced_progress + seconds;
+            } else {
+                m_adjusted_progress += seconds;
             }
-            float duration = tmp.get_int_value('l');
-            if (duration > 0)
-                m_progress = m_adjusted_progress / duration;
-            bdebug("Progress: %.3f", m_progress);
+        } else if (m_synced_progress > 0) {
+            m_adjusted_progress += seconds;
         }
-    }
 
-    if (!m_active) {
+        float duration = tmp.get_int_value('l');
+        if (duration > 0)
+            m_progress = m_adjusted_progress / duration;
+    } else {
         float step = 0.0005f * m_cx;
         if (m_bounce_up)
             m_bounce_progress = fmin(m_bounce_progress + seconds * step, 1.f);

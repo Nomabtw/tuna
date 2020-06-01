@@ -43,10 +43,10 @@ cp ../LICENSE $build_dir/LICENSE.txt
 cp ./install-mac.sh $build_dir/
 
 echo "Writing version number $version and project id $project"
-sed -i -e "s/@VERSION/$version/g" ./README.txt
-sed -i -e "s/@PROJECT/$project/g" ./README.txt-e
+sed -i -e "s/@VERSION/$version/g" ./README
+sed -i -e "s/@PROJECT/$project/g" ./README-e
 rm $build_dir/README.txt
-mv ./README.txt-e $build_dir/README.txt
+mv ./README-e-e $build_dir/README.txt
 
 echo "Zipping to $project.v$version.$arch.zip"
 cd $build_dir
@@ -55,3 +55,4 @@ cd ..
 
 echo "Cleaning up"
 rm -rf $build_dir
+rm -rf README-e
