@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.5)
 project(tuna)
 
+add_subdirectory(deps)
+
 string(TIMESTAMP TODAY "%Y.%m.%d %H:%M")
 add_definitions(-DBUILD_TIME="${TODAY}")
 
@@ -8,16 +10,15 @@ set(CMAKE_INCLUDE_CURRENT_DIR TRUE)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 find_package(Qt5Widgets REQUIRED)
 find_package(Libcurl REQUIRED)
-include_directories(${LIBCURL_INCLUDE_DIRS})
-add_definitions(${LIBCURL_DEFINITIONS})
+find_package(LibVLC QUIET)
 
-if (NOT Qt5Widgets_FOUND)
-    message(FATAL_ERROR "Failed to find Qt5")
-endif ()
+include_directories(${LIBCURL_INCLUDE_DIRS})
+include_directories(${LIB_MPDCLIENT_INCLUDE_DIR})
+
+add_definitions(${LIBCURL_DEFINITIONS})
 
 # Read Spotify credentials from creds.txt
 # In this format {client_id}:{client_secre}
@@ -34,47 +35,26 @@ set(tuna_ui
 qt5_wrap_ui(tuna_ui_headers ${tuna_ui})
 qt5_add_resources(tuna_qrc_sources src/gui/tuna.qrc)
 
-find_package(LibVLC QUIET)
-
-
 if (UNIX AND NOT APPLE)
     add_definitions(-DLINUX=1)
-    find_package(Taglib)
     set(tuna_platform_sources "./src/util/window/window_helper_nix.cpp")
-    set(tuna_platform_deps
-            mpdclient
-            tag)
-    set(tuna_platform_includes
-            ${TAGLIB_INCLUDES})
 endif()
 
 if (APPLE)
     add_definitions(-DMACOS=1)
     set(tuna_platform_sources "./src/util/window/window_helper_mac.mm")
-        find_library(COCOA Cocoa)
-        find_library(MPDCLIENT mpdclient)
-        find_library(TAG tag)
-        find_path(MPDCLIENT_INCLUDES mpd/client.h)
-        find_path(TAG_INCLUDES taglib/tag.h)
+    find_library(COCOA Cocoa)
 
     include_directories(${COCOA})
-        include_directories(${TAG_INCLUDES})
-        include_directories(${MPDCLIENT_INCLUDES})
     set_source_files_properties("./src/util/window/window_helper_mac.mm"
         PROPERTIES COMPILE_FLAGS "-fobjc-arc")
 
     set(tuna_platform_deps
-            ${COCOA}
-            ${MPDCLIENT}
-            ${TAG})
+        ${COCOA})
 endif()
 
 if (UNIX)
     add_definitions(-DUNIX=1)
-
-    set(tuna_platform_sources ${tuna_platform_sources}
-        "./src/util/cover_tag_handler.cpp"
-        "./src/util/cover_tag_handler.hpp")
 endif ()
 
 if (MSVC)
@@ -106,11 +86,6 @@ else()
         ./src/util/vlc_internal.c)
 endif()
 
-if (TAG OR TAGLIB_FOUND)
-    message(STATUS "[tuna] MPD support enabled")
-    add_definitions(-DHAVE_MPD)
-endif()
-
 set(tuna_sources
     ./src/tuna_plugin.cpp
     ./src/util/constants.hpp
@@ -139,14 +114,17 @@ set(tuna_sources
     ./src/util/format.hpp
     ./src/source/progress.cpp
     ./src/source/progress.hpp
-    ${tuna_vlc_source}
+    ./src/util/cover_tag_handler.cpp
+    ./src/util/cover_tag_handler.hpp
     ./src/query/vlc_obs_source.hpp
     ./src/util/tuna_thread.cpp
     ./src/util/tuna_thread.hpp
     ./src/util/utility.cpp
     ./src/util/utility.hpp
     ./src/util/window/window_helper.hpp
-    ${tuna_ui_headers})
+    ${tuna_ui_headers}
+    ${tuna_vlc_source}
+    )
 
 add_library(tuna MODULE
     ${tuna_sources}
@@ -164,6 +142,8 @@ include_directories(
 target_link_libraries(tuna
     libobs
     jansson
+    tag
+    mpdclient
     Qt5::Widgets
     Qt5::Core
     obs-frontend-api
