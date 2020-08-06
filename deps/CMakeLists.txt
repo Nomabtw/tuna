@@ -16,34 +16,34 @@ file(GLOB_RECURSE taglib_HDR "${CMAKE_CURRENT_SOURCE_DIR}/taglib/taglib/*.h")
 file(GLOB_RECURSE taglib_SRC "${CMAKE_CURRENT_SOURCE_DIR}/taglib/taglib/*.cpp")
 
 include_directories(
-  ${TAGLIB_INCLUDE_DIRS}/taglib
-  ${TAGLIB_INCLUDE_DIRS}/taglib/toolkit
-  ${TAGLIB_INCLUDE_DIRS}/taglib/asf
-  ${TAGLIB_INCLUDE_DIRS}/taglib/mpeg
-  ${TAGLIB_INCLUDE_DIRS}/taglib/ogg
-  ${TAGLIB_INCLUDE_DIRS}/taglib/ogg/flac
-  ${TAGLIB_INCLUDE_DIRS}/taglib/flac
-  ${TAGLIB_INCLUDE_DIRS}/taglib/mpc
-  ${TAGLIB_INCLUDE_DIRS}/taglib/mp4
-  ${TAGLIB_INCLUDE_DIRS}/taglib/ogg/vorbis
-  ${TAGLIB_INCLUDE_DIRS}/taglib/ogg/speex
-  ${TAGLIB_INCLUDE_DIRS}/taglib/ogg/opus
-  ${TAGLIB_INCLUDE_DIRS}/taglib/mpeg/id3v2
-  ${TAGLIB_INCLUDE_DIRS}/taglib/mpeg/id3v2/frames
-  ${TAGLIB_INCLUDE_DIRS}/taglib/mpeg/id3v1
-  ${TAGLIB_INCLUDE_DIRS}/taglib/ape
-  ${TAGLIB_INCLUDE_DIRS}/taglib/wavpack
-  ${TAGLIB_INCLUDE_DIRS}/taglib/trueaudio
-  ${TAGLIB_INCLUDE_DIRS}/taglib/riff
-  ${TAGLIB_INCLUDE_DIRS}/taglib/riff/aiff
-  ${TAGLIB_INCLUDE_DIRS}/taglib/riff/wav
-  ${TAGLIB_INCLUDE_DIRS}/taglib/mod
-  ${TAGLIB_INCLUDE_DIRS}/taglib/s3m
-  ${TAGLIB_INCLUDE_DIRS}/taglib/it
-  ${TAGLIB_INCLUDE_DIRS}/taglib/xm
-  ${TAGLIB_INCLUDE_DIRS}/taglib/dsf
-  ${TAGLIB_INCLUDE_DIRS}/taglib/dsdiff
-  ${CMAKE_CURRENT_SOURCE_DIR}/taglib/3rdparty
+    ${TAGLIB_INCLUDE_DIRS}/taglib
+    ${TAGLIB_INCLUDE_DIRS}/taglib/toolkit
+    ${TAGLIB_INCLUDE_DIRS}/taglib/asf
+    ${TAGLIB_INCLUDE_DIRS}/taglib/mpeg
+    ${TAGLIB_INCLUDE_DIRS}/taglib/ogg
+    ${TAGLIB_INCLUDE_DIRS}/taglib/ogg/flac
+    ${TAGLIB_INCLUDE_DIRS}/taglib/flac
+    ${TAGLIB_INCLUDE_DIRS}/taglib/mpc
+    ${TAGLIB_INCLUDE_DIRS}/taglib/mp4
+    ${TAGLIB_INCLUDE_DIRS}/taglib/ogg/vorbis
+    ${TAGLIB_INCLUDE_DIRS}/taglib/ogg/speex
+    ${TAGLIB_INCLUDE_DIRS}/taglib/ogg/opus
+    ${TAGLIB_INCLUDE_DIRS}/taglib/mpeg/id3v2
+    ${TAGLIB_INCLUDE_DIRS}/taglib/mpeg/id3v2/frames
+    ${TAGLIB_INCLUDE_DIRS}/taglib/mpeg/id3v1
+    ${TAGLIB_INCLUDE_DIRS}/taglib/ape
+    ${TAGLIB_INCLUDE_DIRS}/taglib/wavpack
+    ${TAGLIB_INCLUDE_DIRS}/taglib/trueaudio
+    ${TAGLIB_INCLUDE_DIRS}/taglib/riff
+    ${TAGLIB_INCLUDE_DIRS}/taglib/riff/aiff
+    ${TAGLIB_INCLUDE_DIRS}/taglib/riff/wav
+    ${TAGLIB_INCLUDE_DIRS}/taglib/mod
+    ${TAGLIB_INCLUDE_DIRS}/taglib/s3m
+    ${TAGLIB_INCLUDE_DIRS}/taglib/it
+    ${TAGLIB_INCLUDE_DIRS}/taglib/xm
+    ${TAGLIB_INCLUDE_DIRS}/taglib/dsf
+    ${TAGLIB_INCLUDE_DIRS}/taglib/dsdiff
+    ${CMAKE_CURRENT_SOURCE_DIR}/taglib/3rdparty
 )
 
 add_library(tag STATIC ${taglib_SRC} ${taglib_HDR})

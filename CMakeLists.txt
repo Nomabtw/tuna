@@ -1,7 +1,14 @@
 cmake_minimum_required(VERSION 3.5)
-project(tuna)
+project(tuna VERSION 1.4.3)
 
 add_subdirectory(deps)
+
+set(PLUGIN_AUTHOR "univrsal")
+set(PLUGIN_GIT tuna)
+set(LINUX_MAINTAINER_EMAIL "uni@vrsal.cf")
+set(MACOS_BUNDLEID "cf.vrsal.tuna")
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 string(TIMESTAMP TODAY "%Y.%m.%d %H:%M")
 add_definitions(-DBUILD_TIME="${TODAY}")
@@ -11,14 +18,40 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 
+if (MSVC OR APPLE)
+    include(${CMAKE_SOURCE_DIR}/cmake/FindLibObs.cmake)
+    include(${CMAKE_SOURCE_DIR}/cmake/ObsPluginHelpers.cmake)
+endif()
+
+find_package(LibObs REQUIRED)
 find_package(Qt5Widgets REQUIRED)
 find_package(Libcurl REQUIRED)
 find_package(LibVLC QUIET)
 
+option(LOCAL_INSTALLATION "Whether to install for the current user (default: OFF)" OFF)
+option(GLOBAL_INSTALLATION "Whether to install for all users (default: OFF)" OFF)
+
 include_directories(${LIBCURL_INCLUDE_DIRS})
 include_directories(${LIB_MPDCLIENT_INCLUDE_DIR})
 
+if (OBS_FRONTEND_INCLUDE)
+    include_directories(${OBS_FRONTEND_INCLUDE})
+endif()
+
 add_definitions(${LIBCURL_DEFINITIONS})
+
+configure_file(
+    package/installer-macOS.pkgproj.in
+    ../package/installer-macOS.pkgproj
+)
+configure_file(
+    package/installer-Windows.iss.in
+    ../package/installer-Windows.iss
+)
+configure_file(
+    package/README.txt.in
+    ../package/README.txt
+)
 
 # Read Spotify credentials from creds.txt
 # In this format {client_id}:{client_secre}
@@ -58,9 +91,9 @@ if (UNIX)
 endif ()
 
 if (MSVC)
-   set(tuna_platform_sources "./src/util/window/window_helper_win.cpp")
-   set(tuna_platform_deps
-            w32-pthreads)
+    set(tuna_platform_sources "./src/util/window/window_helper_win.cpp")
+    set(tuna_platform_deps
+        ${PTHREADS_LIB})
 endif ()
 
 if (NOT LIBVLC_INCLUDES_FOUND AND ENABLE_VLC)
@@ -133,11 +166,11 @@ add_library(tuna MODULE
     ${tuna_qrc_sources})
 
 include_directories(
-        SYSTEM "${CMAKE_SOURCE_DIR}/libobs"
-        "../../UI/obs-frontend-api"
-        ${tuna_platform_includes}
-        ${Qt5Core_INCLUDES}
-        ${Qt5Widgets_INCLUDES})
+    "${LIBOBS_INCLUDE_DIR}/../UI/obs-frontend-api"
+    ${LIBOBS_INCLUDE_DIR}
+    ${Qt5Core_INCLUDES}
+    ${Qt5Widgets_INCLUDES}
+)
 
 target_link_libraries(tuna
     libobs
@@ -150,6 +183,66 @@ target_link_libraries(tuna
     ${LIBCURL_LIBRARIES}
     ${tuna_platform_deps})
 
-set_property(TARGET tuna PROPERTY CXX_STANDARD 14)
+# --- Windows-specific build settings and tasks ---
+if(WIN32)
+    if(NOT DEFINED OBS_FRONTEND_LIB)
+        set(OBS_FRONTEND_LIB "OBS_FRONTEND_LIB-NOTFOUND" CACHE FILEPATH "OBS frontend library")
+        message(FATAL_ERROR "Could not find OBS Frontend API\'s library !")
+    endif()
 
-install_obs_plugin_with_data(tuna data)
+    # Enable Multicore Builds and disable FH4 (to not depend on VCRUNTIME140_1.DLL when building with VS2019)
+    if (MSVC)
+        add_definitions(/MP /d2FH4-)
+    endif()
+
+    include_directories(
+        "${LIBOBS_INCLUDE_DIR}"
+    )
+
+    target_link_libraries(${CMAKE_PROJECT_NAME}
+        "${OBS_FRONTEND_LIB}"
+    )
+    install_external_plugin_with_data(${CMAKE_PROJECT_NAME} "data")
+endif()
+
+if(UNIX AND NOT APPLE)
+    include(GNUInstallDirs)
+
+    set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES PREFIX "")
+    target_link_libraries(${CMAKE_PROJECT_NAME} obs-frontend-api)
+
+    if (LOCAL_INSTALLATION)
+        # Installs into home directory
+        install(TARGETS ${CMAKE_PROJECT_NAME}
+            LIBRARY DESTINATION "$ENV{HOME}/.config/obs-studio/plugins/${CMAKE_PROJECT_NAME}/bin/${OBS_ARCH_NAME}")
+
+        install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data
+            DESTINATION "$ENV{HOME}/.config/obs-studio/plugins/${CMAKE_PROJECT_NAME}/")
+    elseif(GLOBAL_INSTALLATION)
+        # For *.deb installer
+        install(TARGETS ${CMAKE_PROJECT_NAME}
+            LIBRARY DESTINATION "${CMAKE_INSTALL_FULL_LIBDIR}/obs-plugins")
+
+        install(FILES ${locale_files}
+            DESTINATION "${CMAKE_INSTALL_FULL_DATAROOTDIR}/obs/obs-plugins/${CMAKE_PROJECT_NAME}/locale")
+    else()
+        # For *.zip binary
+        install(TARGETS ${CMAKE_PROJECT_NAME}
+            LIBRARY DESTINATION "${CMAKE_PROJECT_NAME}/bin/${OBS_ARCH_NAME}")
+
+        install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data
+            DESTINATION "${CMAKE_PROJECT_NAME}")
+        
+        install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/package/README.txt"
+            DESTINATION "${CMAKE_PROJECT_NAME}")
+    endif()
+elseif(APPLE)
+    if(NOT DEFINED OBS_FRONTEND_LIB)
+        set(OBS_FRONTEND_LIB "OBS_FRONTEND_LIB-NOTFOUND" CACHE FILEPATH "OBS frontend library")
+        message(FATAL_ERROR "Could not find OBS Frontend API\'s library !")
+    endif()
+
+    target_link_libraries(${CMAKE_PROJECT_NAME}
+        "${OBS_FRONTEND_LIB}"
+    )
+endif()
